@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/go-co-op/gocron"
 	"github.com/redis/go-redis/v9"
 	gomail "gopkg.in/gomail.v2"
 )
@@ -38,6 +39,7 @@ func Menu(redisClient *redis.Client) {
 		addTask(redisClient, title)
 		SendMail("New Task Added", "Task Tittle : "+title)
 		Menu(redisClient)
+		gocrons()
 	case 2:
 		var id int
 		fmt.Println("Enter task id to delete:")
@@ -113,4 +115,21 @@ func SendMail(subject string, body string) {
 		panic(err)
 	}
 
+}
+
+func gocrons() {
+	local, err := time.LoadLocation("Asia/Jakarta")
+	if err != nil {
+		local = time.UTC
+	}
+	s := gocron.NewScheduler(local)
+	startTime := time.Now()
+	s.Every(60).Second().Do(func() {
+		elapsed := time.Since(startTime)
+		minuteCounter := 5 - int(elapsed.Minutes())
+		SendMail("Reminder", fmt.Sprintf("%d Minutes left!", minuteCounter))
+	})
+	s.StartBlocking()
+	time.Sleep(5 * time.Minute)
+	s.Clear()
 }
