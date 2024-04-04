@@ -38,8 +38,8 @@ func Menu(redisClient *redis.Client) {
 		fmt.Scan(&title)
 		addTask(redisClient, title)
 		SendMail("New Task Added", "Task Tittle : "+title)
-		Menu(redisClient)
 		gocrons()
+		Menu(redisClient)
 	case 2:
 		var id int
 		fmt.Println("Enter task id to delete:")
@@ -62,6 +62,10 @@ func printTask(client *redis.Client) {
 	fmt.Println("All tasks:")
 	for id, task := range tasks {
 		fmt.Printf("ID: %d, Task: %s\n", id, task)
+
+		go func() {
+			SendMail("Task List", fmt.Sprintf("ID: %d, Task: %s\n", id, task))
+		}()
 	}
 }
 
@@ -74,19 +78,16 @@ func addTask(client *redis.Client, task string) {
 }
 
 func deleteTask(client *redis.Client, id int) {
-	// Get all tasks
 	tasks, err := getAllTasks(client)
 	if err != nil {
 		log.Fatal("Error retrieving tasks:", err)
 	}
 
-	// Check if the ID is valid
 	if id < 0 || id >= len(tasks) {
 		fmt.Println("Invalid ID")
 		return
 	}
 
-	// Remove the task from the list
 	err = client.LRem(ctx, "tasks", 0, tasks[id]).Err()
 	if err != nil {
 		log.Fatal("Error deleting task:", err)
@@ -100,10 +101,6 @@ func getAllTasks(client *redis.Client) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	go func() {
-		SendMail("Test Subject", "Hello, this is the email body.")
-	}()
 
 	return tasks, nil
 }
