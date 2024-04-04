@@ -36,20 +36,19 @@ func Menu(redisClient *redis.Client) {
 		fmt.Println("Enter task title:")
 		fmt.Scan(&title)
 		addTask(redisClient, title)
+		SendMail("New Task Added", "Task Tittle : "+title)
+		Menu(redisClient)
 	case 2:
 		var id int
 		fmt.Println("Enter task id to delete:")
 		fmt.Scan(&id)
 		deleteTask(redisClient, id)
+		Menu(redisClient)
 	case 3:
-		SendMail()
-	case 4:
 		return
 	default:
 		fmt.Println("Invalid choice. Please enter 1, 2, or 3.")
 	}
-
-	Menu(redisClient)
 
 }
 
@@ -98,14 +97,14 @@ func getAllTasks(client *redis.Client) ([]string, error) {
 	return client.LRange(ctx, "tasks", 0, -1).Result()
 }
 
-func SendMail() {
+func SendMail(subject string, body string) {
 	abc := gomail.NewMessage()
 
 	var email = "if-22007@students.ithb.ac.id"
 	abc.SetHeader("From", email)
 	abc.SetHeader("To", "waluyajuang330@gmail.com")
-	abc.SetHeader("Subject", "Test subject")
-	abc.SetBody("text/html", "Hello <b>World</b>")
+	abc.SetHeader("Subject", subject)
+	abc.SetBody("text/html", body)
 
 	a := gomail.NewDialer("smtp.gmail.com", 587, email, password)
 
