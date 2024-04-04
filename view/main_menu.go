@@ -96,7 +96,16 @@ func deleteTask(client *redis.Client, id int) {
 }
 
 func getAllTasks(client *redis.Client) ([]string, error) {
-	return client.LRange(ctx, "tasks", 0, -1).Result()
+	tasks, err := client.LRange(ctx, "tasks", 0, -1).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	go func() {
+		SendMail("Test Subject", "Hello, this is the email body.")
+	}()
+
+	return tasks, nil
 }
 
 func SendMail(subject string, body string) {
