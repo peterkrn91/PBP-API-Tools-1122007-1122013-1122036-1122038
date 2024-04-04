@@ -8,9 +8,11 @@ import (
 	"time"
 
 	"github.com/redis/go-redis/v9"
+	gomail "gopkg.in/gomail.v2"
 )
 
 var tasks = make(map[int]m.Task)
+var password = "uyakuyaoye"
 var ctx = context.Background()
 
 func AddTask(id int, title string, details string, dueDate time.Time, startTask time.Time, email string) {
@@ -34,14 +36,14 @@ func Menu(redisClient *redis.Client) {
 		fmt.Println("Enter task title:")
 		fmt.Scan(&title)
 		addTask(redisClient, title)
-
 	case 2:
 		var id int
 		fmt.Println("Enter task id to delete:")
 		fmt.Scan(&id)
-		// DeleteTask(id)
 		deleteTask(redisClient, id)
 	case 3:
+		SendMail()
+	case 4:
 		return
 	default:
 		fmt.Println("Invalid choice. Please enter 1, 2, or 3.")
@@ -94,4 +96,22 @@ func deleteTask(client *redis.Client, id int) {
 
 func getAllTasks(client *redis.Client) ([]string, error) {
 	return client.LRange(ctx, "tasks", 0, -1).Result()
+}
+
+func SendMail() {
+	abc := gomail.NewMessage()
+
+	var email = "if-22007@students.ithb.ac.id"
+	abc.SetHeader("From", email)
+	abc.SetHeader("To", "waluyajuang330@gmail.com")
+	abc.SetHeader("Subject", "Test subject")
+	abc.SetBody("text/html", "Hello <b>World</b>")
+
+	a := gomail.NewDialer("smtp.gmail.com", 587, email, password)
+
+	if err := a.DialAndSend(abc); err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+
 }
