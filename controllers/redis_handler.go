@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"context"
-	"fmt"
 	"log"
+
+	main "PBP-API-Tools-1122007-1122013-1122036-1122038/view"
 
 	"github.com/redis/go-redis/v9"
 )
@@ -23,26 +24,5 @@ func InitializeRedisClient() {
 		log.Fatal("Error connecting to Redis:", err)
 	}
 
-	// Example: Add tasks to the list
-	addTask(redisClient, "Task 1")
-	addTask(redisClient, "Task 2")
-	addTask(redisClient, "Task 3")
-
-	// Example: Retrieve all tasks
-	tasks, err := getAllTasks(redisClient)
-	if err != nil {
-		log.Fatal("Error retrieving tasks:", err)
-	}
-	fmt.Println("All tasks:")
-	for _, task := range tasks {
-		fmt.Println(task)
-	}
-}
-
-func addTask(client *redis.Client, task string) {
-	client.LPush(ctx, "tasks", task)
-}
-
-func getAllTasks(client *redis.Client) ([]string, error) {
-	return client.LRange(ctx, "tasks", 0, -1).Result()
+	main.Menu(redisClient)
 }
