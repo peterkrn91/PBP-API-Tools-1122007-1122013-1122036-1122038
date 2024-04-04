@@ -130,12 +130,12 @@ func gocrons() {
 	}
 	s := gocron.NewScheduler(local)
 	startTime := time.Now()
-	s.Every(60).Second().Do(func() {
+	s.Every(5).Minute().Do(func() {
 		elapsed := time.Since(startTime)
 		minuteCounter := 5 - int(elapsed.Minutes())
 		SendMail("Reminder", fmt.Sprintf("%d Minutes left!", minuteCounter))
 	})
 	s.StartBlocking()
-	time.Sleep(5 * time.Minute)
+	time.Sleep(1 * time.Minute)
 	s.Clear()
 }
