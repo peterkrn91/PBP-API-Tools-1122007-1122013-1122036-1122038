@@ -16,12 +16,6 @@ var tasks = make(map[int]m.Task)
 var password = "uyakuyaoye"
 var ctx = context.Background()
 
-func AddTask(id int, title string, details string, dueDate time.Time, startTask time.Time, email string) {
-	task := m.Task{ID: id, Title: title, Details: details, DueDate: dueDate, StartTask: startTask, Email: email}
-	tasks[id] = task
-	fmt.Println("Task added successfully")
-}
-
 func Menu(redisClient *redis.Client) {
 	printTask(redisClient)
 
